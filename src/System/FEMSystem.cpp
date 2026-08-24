@@ -1,7 +1,7 @@
-#include "FEMSystem.h"
+#include "System/FEMSystem.h"
 
-#include "Element.h"
-#include "Mesh.h"
+#include "Elements/Element.h"
+#include "Mesh/Mesh.h"
 
 FEMSystem::FEMSystem(int n_dof)
     : A(n_dof, Vector(n_dof, 0.0)),

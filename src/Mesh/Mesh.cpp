@@ -1,4 +1,4 @@
-#include "Mesh.h"
+#include "Mesh/Mesh.h"
 
 Mesh::Mesh(int n_elements, double length)
     : dimension(1)

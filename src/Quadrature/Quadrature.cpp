@@ -1,4 +1,4 @@
-#include "Quadrature.h"
+#include "Quadrature/Quadrature.h"
 
 #include <cmath>
 

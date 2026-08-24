@@ -2,14 +2,14 @@ CXX = g++
 CXXFLAGS = -std=c++17 -Wall -Wextra -Iinclude
 
 COMMON_SOURCES = \
-	src/Mesh.cpp \
-	src/Physics.cpp \
-	src/ShapeFunction.cpp \
-	src/Quadrature.cpp \
-	src/Element.cpp \
-	src/FEMSystem.cpp \
-	src/DirichletBC.cpp \
-	src/LinearSolver.cpp
+	src/Mesh/Mesh.cpp \
+	src/Physics/Physics.cpp \
+	src/ShapeFunctions/ShapeFunction.cpp \
+	src/Quadrature/Quadrature.cpp \
+	src/Elements/Element.cpp \
+	src/System/FEMSystem.cpp \
+	src/BCs/DirichletBC.cpp \
+	src/Solvers/LinearSolver.cpp
 
 all: solver1d solver2d
 

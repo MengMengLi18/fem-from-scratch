@@ -1,4 +1,4 @@
-#include "ShapeFunction.h"
+#include "ShapeFunctions/ShapeFunction.h"
 
 #include <stdexcept>
 

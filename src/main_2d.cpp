@@ -4,12 +4,12 @@
 #include <stdexcept>
 #include <vector>
 
-#include "DirichletBC.h"
-#include "Element.h"
-#include "FEMSystem.h"
-#include "LinearSolver.h"
-#include "Mesh.h"
-#include "Physics.h"
+#include "BCs/DirichletBC.h"
+#include "Elements/Element.h"
+#include "System/FEMSystem.h"
+#include "Solvers/LinearSolver.h"
+#include "Mesh/Mesh.h"
+#include "Physics/Physics.h"
 
 static Vector solve_poisson_2d(const Mesh& mesh, const PoissonPhysics& physics)
 {

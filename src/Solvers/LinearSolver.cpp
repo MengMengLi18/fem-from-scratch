@@ -1,4 +1,4 @@
-#include "LinearSolver.h"
+#include "Solvers/LinearSolver.h"
 
 #include <cmath>
 #include <stdexcept>

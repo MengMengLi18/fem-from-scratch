@@ -1,12 +1,12 @@
-#include "Element.h"
+#include "Elements/Element.h"
 
 #include <cmath>
 #include <stdexcept>
 
-#include "Mesh.h"
-#include "Physics.h"
-#include "Quadrature.h"
-#include "ShapeFunction.h"
+#include "Mesh/Mesh.h"
+#include "Physics/Physics.h"
+#include "Quadrature/Quadrature.h"
+#include "ShapeFunctions/ShapeFunction.h"
 
 int LineElement::num_nodes() const
 {
