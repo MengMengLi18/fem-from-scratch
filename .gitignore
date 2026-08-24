@@ -1,0 +1,10 @@
+# Build outputs
+/solver1d
+/solver2d
+
+# Compiled object files
+*.o
+*.obj
+
+# Editor/IDE caches
+.vscode/
