@@ -11,15 +11,12 @@
 //      A x = b
 // ============================================================
 
-Vector solve_linear_system(
-    Matrix A,
-    Vector b)
+Vector solve_linear_system(Matrix A, Vector b)
 {
     int n = A.size();
 
-
     // --------------------------------------------------------
-    // Forward elimination
+    // Forward elimination: 把矩阵消成上三角矩阵
     // --------------------------------------------------------
 
     for (int k = 0; k < n; ++k)
@@ -54,48 +51,33 @@ Vector solve_linear_system(
         // Eliminate
         for (int i = k + 1; i < n; ++i)
         {
-            double factor =
-                A[i][k] / A[k][k];
-
+            double factor = A[i][k] / A[k][k];
 
             for (int j = k; j < n; ++j)
             {
-                A[i][j]
-                -=
-                factor * A[k][j];
+                A[i][j] -= factor * A[k][j];
             }
 
-
-            b[i]
-            -=
-            factor * b[k];
+            b[i] -= factor * b[k];
         }
     }
 
-
     // --------------------------------------------------------
-    // Back substitution
+    // Back substitution: 从最后一个未知量往回求解
     // --------------------------------------------------------
 
     Vector x(n, 0.0);
-
 
     for (int i = n - 1; i >= 0; --i)
     {
         double sum = b[i];
 
-
         for (int j = i + 1; j < n; ++j)
         {
-            sum
-            -=
-            A[i][j] * x[j];
+            sum -= A[i][j] * x[j];
         }
 
-
-        x[i]
-        =
-        sum / A[i][i];
+        x[i] = sum / A[i][i];
     }
 
 

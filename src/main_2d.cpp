@@ -9,7 +9,7 @@
 #include "System/FEMSystem.h"
 #include "Solvers/LinearSolver.h"
 #include "Mesh/Mesh.h"
-#include "Physics/Physics.h"
+#include "Models/PoissonPhysics.h"
 
 static Vector solve_poisson_2d(const Mesh& mesh, const PoissonPhysics& physics)
 {

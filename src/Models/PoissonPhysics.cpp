@@ -1,4 +1,4 @@
-#include "Physics/Physics.h"
+#include "Models/PoissonPhysics.h"
 
 double PoissonPhysics::diffusivity(double, double) const
 {

@@ -40,18 +40,19 @@ void LineElement::compute(const Mesh& mesh,
     {
         double N[n];
         double dNdx[n];
-
+        // get the shape function values at the quadrature point
         for (int i = 0; i < n; ++i)
         {
             N[i] = shape.value(i, gp.xi);
             const double dNdxi = shape.derivative(i, gp.xi)[0];
             dNdx[i] = dNdxi / J;
         }
-
+        // mapping from reference element to physical element
         const double x = N[0] * x0 + N[1] * x1;
+        // get the physical properties from the physics object
         const double k = physics.diffusivity(x, 0.0);
         const double f = physics.source(x, 0.0);
-
+        // assemble the local stiffness matrix and load vector
         for (int i = 0; i < n; ++i)
         {
             Fe[i] += f * N[i] * gp.weight * J;

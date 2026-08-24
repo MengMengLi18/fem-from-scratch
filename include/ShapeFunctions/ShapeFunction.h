@@ -7,7 +7,10 @@
 class ShapeFunction
 {
 public:
-    virtual ~ShapeFunction() = default;
+// 造函数 ShapeFunction()：对象出生时做什么
+// 析构函数 ~ShapeFunction()：对象销毁时做什么
+
+    virtual ~ShapeFunction() = default;   // 析构函数, ~ 表示析构函数它在这个对象销毁时自动调用
 
     virtual int num_nodes() const = 0;
     virtual double value(int i, double xi, double eta = 0.0) const = 0;

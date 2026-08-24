@@ -3,7 +3,7 @@ CXXFLAGS = -std=c++17 -Wall -Wextra -Iinclude
 
 COMMON_SOURCES = \
 	src/Mesh/Mesh.cpp \
-	src/Physics/Physics.cpp \
+	src/Models/PoissonPhysics.cpp \
 	src/ShapeFunctions/ShapeFunction.cpp \
 	src/Quadrature/Quadrature.cpp \
 	src/Elements/Element.cpp \

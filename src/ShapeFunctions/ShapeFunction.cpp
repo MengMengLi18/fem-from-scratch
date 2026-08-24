@@ -6,7 +6,7 @@ int LineShapeFunction::num_nodes() const
 {
     return 2;
 }
-
+// 一次 Lagrange 多项式
 double LineShapeFunction::value(int i, double xi, double) const
 {
     if (i == 0)
@@ -29,7 +29,7 @@ int TriangleShapeFunction::num_nodes() const
 {
     return 3;
 }
-
+// 参考三角形上的线性 Lagrange 函数, 也就是面积坐标
 double TriangleShapeFunction::value(int i, double xi, double eta) const
 {
     if (i == 0)
@@ -56,7 +56,7 @@ int QuadrilateralShapeFunction::num_nodes() const
 {
     return 4;
 }
-
+// 1D Lagrange 函数的张量积，形成双线性形函数
 double QuadrilateralShapeFunction::value(int i, double xi, double eta) const
 {
     static constexpr double xi_node[4] = {-1.0, 1.0, 1.0, -1.0};

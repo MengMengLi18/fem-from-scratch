@@ -6,7 +6,7 @@
 #include "System/FEMSystem.h"
 #include "Solvers/LinearSolver.h"
 #include "Mesh/Mesh.h"
-#include "Physics/Physics.h"
+#include "Models/PoissonPhysics.h"
 
 // ============================================================
 // 9. Main
