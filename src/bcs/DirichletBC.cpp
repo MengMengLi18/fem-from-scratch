@@ -1,4 +1,4 @@
-#include "BCs/DirichletBC.h"
+#include "bcs/DirichletBC.h"
 
 void apply_dirichlet(
     Matrix& A,

@@ -4,14 +4,16 @@
 #include <stdexcept>
 #include <vector>
 
-#include "BCs/DirichletBC.h"
-#include "Elements/Element.h"
-#include "System/FEMSystem.h"
-#include "Solvers/LinearSolver.h"
-#include "Mesh/Mesh.h"
-#include "Models/PoissonPhysics.h"
+#include "bcs/DirichletBC.h"
+#include "elements/Element.h"
+#include "assembly/FEMSystem.h"
+#include "solvers/LinearSolver.h"
+#include "mesh/Mesh.h"
+#include "materials/ConstantDiffusivity.h"
+#include "kernels/PoissonKernel.h"
+#include "postprocess/Output.h"
 
-static Vector solve_poisson_2d(const Mesh& mesh, const PoissonPhysics& physics)
+static Vector solve_poisson_2d(const Mesh& mesh, const PoissonKernel& kernel)
 {
     FEMSystem system(mesh.num_nodes());
 
@@ -22,13 +24,13 @@ static Vector solve_poisson_2d(const Mesh& mesh, const PoissonPhysics& physics)
         if (nodes_per_element == 3)
         {
             TriangleElement element;
-            element.compute(mesh, e, physics);
+            element.compute(mesh, e, kernel);
             system.assemble(mesh, e, element);
         }
         else if (nodes_per_element == 4)
         {
             QuadrilateralElement element;
-            element.compute(mesh, e, physics);
+            element.compute(mesh, e, kernel);
             system.assemble(mesh, e, element);
         }
         else
@@ -51,22 +53,10 @@ static Vector solve_poisson_2d(const Mesh& mesh, const PoissonPhysics& physics)
     return solve_linear_system(system.A, system.b);
 }
 
-static void print_center_value(const Mesh& mesh, const Vector& u)
-{
-    for (int n = 0; n < mesh.num_nodes(); ++n)
-    {
-        if (std::abs(mesh.nodes[n][0] - 0.5) < 1e-12 &&
-            std::abs(mesh.nodes[n][1] - 0.5) < 1e-12)
-        {
-            std::cout << "center u = " << u[n] << '\n';
-            return;
-        }
-    }
-}
-
 int main()
 {
-    PoissonPhysics physics;
+    ConstantDiffusivity material;
+    PoissonKernel kernel(material);
     std::cout << std::setprecision(8);
 
     // Triangle mesh: square split into four triangles around a center node.
@@ -79,7 +69,7 @@ int main()
     Mesh tri_mesh(2, tri_nodes, tri_elements);
 
     std::cout << "Triangle mesh:\n";
-    print_center_value(tri_mesh, solve_poisson_2d(tri_mesh, physics));
+    print_center_value(tri_mesh, solve_poisson_2d(tri_mesh, kernel), std::cout);
 
     // Quadrilateral mesh: square split into 2x2 quadrilaterals.
     std::vector<Node2D> quad_nodes = {
@@ -94,7 +84,7 @@ int main()
     Mesh quad_mesh(2, quad_nodes, quad_elements);
 
     std::cout << "Quadrilateral mesh:\n";
-    print_center_value(quad_mesh, solve_poisson_2d(quad_mesh, physics));
+    print_center_value(quad_mesh, solve_poisson_2d(quad_mesh, kernel), std::cout);
 
     return 0;
 }

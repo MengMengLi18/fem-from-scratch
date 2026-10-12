@@ -1,13 +1,11 @@
-#include "Solvers/LinearSolver.h"
+#include "solvers/LinearSolver.h"
 
 #include <cmath>
 #include <stdexcept>
 
 // ============================================================
-// 8. Linear solver
-//
+// Linear solver:
 // Gaussian elimination with partial pivoting
-//
 //      A x = b
 // ============================================================
 
@@ -34,7 +32,6 @@ Vector solve_linear_system(Matrix A, Vector b)
             }
         }
 
-
         if (std::abs(A[pivot][k]) < 1e-14)
         {
             throw std::runtime_error(
@@ -42,11 +39,9 @@ Vector solve_linear_system(Matrix A, Vector b)
             );
         }
 
-
         // Swap rows
         std::swap(A[k], A[pivot]);
         std::swap(b[k], b[pivot]);
-
 
         // Eliminate
         for (int i = k + 1; i < n; ++i)

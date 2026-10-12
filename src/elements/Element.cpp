@@ -1,12 +1,12 @@
-#include "Elements/Element.h"
+#include "elements/Element.h"
 
 #include <cmath>
 #include <stdexcept>
 
-#include "Mesh/Mesh.h"
-#include "Physics/Physics.h"
-#include "Quadrature/Quadrature.h"
-#include "ShapeFunctions/ShapeFunction.h"
+#include "mesh/Mesh.h"
+#include "kernels/PoissonKernel.h"
+#include "quadrature/Quadrature.h"
+#include "elements/ShapeFunction.h"
 
 int LineElement::num_nodes() const
 {
@@ -15,7 +15,7 @@ int LineElement::num_nodes() const
 
 void LineElement::compute(const Mesh& mesh,
                           int element_index,
-                          const Physics& physics)
+                          const PoissonKernel& kernel)
 {
     constexpr int n = 2;
     Ke = Matrix(n, Vector(n, 0.0));
@@ -49,18 +49,11 @@ void LineElement::compute(const Mesh& mesh,
         }
         // mapping from reference element to physical element
         const double x = N[0] * x0 + N[1] * x1;
-        // get the physical properties from the physics object
-        const double k = physics.diffusivity(x, 0.0);
-        const double f = physics.source(x, 0.0);
-        // assemble the local stiffness matrix and load vector
+        std::vector<Node2D> gradients(n);
         for (int i = 0; i < n; ++i)
-        {
-            Fe[i] += f * N[i] * gp.weight * J;
-            for (int j = 0; j < n; ++j)
-            {
-                Ke[i][j] += k * dNdx[i] * dNdx[j] * gp.weight * J;
-            }
-        }
+            gradients[i] = {dNdx[i], 0.0};
+        kernel.add_contribution(x, 0.0, Vector(N, N + n), gradients,
+                                gp.weight * J, Ke, Fe);
     }
 }
 
@@ -71,7 +64,7 @@ int TriangleElement::num_nodes() const
 
 void TriangleElement::compute(const Mesh& mesh,
                               int element_index,
-                              const Physics& physics)
+                              const PoissonKernel& kernel)
 {
     constexpr int n = 3;
     Ke = Matrix(n, Vector(n, 0.0));
@@ -121,23 +114,16 @@ void TriangleElement::compute(const Mesh& mesh,
         if (std::abs(detJ) < 1e-14)
             throw std::runtime_error("Degenerate triangle element.");
 
-        const double k = physics.diffusivity(x, y);
-        const double f = physics.source(x, y);
-
+        std::vector<Node2D> gradients(n);
         for (int i = 0; i < n; ++i)
         {
-            const double dNdx = (dyds * dNdr[i] - dxds * dNds[i]) / detJ;
-            const double dNdy = (-dydr * dNdr[i] + dxdr * dNds[i]) / detJ;
-
-            Fe[i] += f * N[i] * gp.weight * detJ;
-
-            for (int j = 0; j < n; ++j)
-            {
-                const double dMdx = (dyds * dNdr[j] - dxds * dNds[j]) / detJ;
-                const double dMdy = (-dydr * dNdr[j] + dxdr * dNds[j]) / detJ;
-                Ke[i][j] += k * (dNdx * dMdx + dNdy * dMdy) * gp.weight * detJ;
-            }
+            gradients[i] = {
+                (dyds * dNdr[i] - dydr * dNds[i]) / detJ,
+                (-dxds * dNdr[i] + dxdr * dNds[i]) / detJ
+            };
         }
+        kernel.add_contribution(x, y, Vector(N, N + n), gradients,
+                                gp.weight * detJ, Ke, Fe);
     }
 }
 
@@ -148,7 +134,7 @@ int QuadrilateralElement::num_nodes() const
 
 void QuadrilateralElement::compute(const Mesh& mesh,
                                    int element_index,
-                                   const Physics& physics)
+                                   const PoissonKernel& kernel)
 {
     constexpr int n = 4;
     Ke = Matrix(n, Vector(n, 0.0));
@@ -198,22 +184,15 @@ void QuadrilateralElement::compute(const Mesh& mesh,
         if (std::abs(detJ) < 1e-14)
             throw std::runtime_error("Degenerate quadrilateral element.");
 
-        const double k = physics.diffusivity(x, y);
-        const double f = physics.source(x, y);
-
+        std::vector<Node2D> gradients(n);
         for (int i = 0; i < n; ++i)
         {
-            const double dNdx = (dyds * dNdr[i] - dxds * dNds[i]) / detJ;
-            const double dNdy = (-dydr * dNdr[i] + dxdr * dNds[i]) / detJ;
-
-            Fe[i] += f * N[i] * gp.weight * detJ;
-
-            for (int j = 0; j < n; ++j)
-            {
-                const double dMdx = (dyds * dNdr[j] - dxds * dNds[j]) / detJ;
-                const double dMdy = (-dydr * dNdr[j] + dxdr * dNds[j]) / detJ;
-                Ke[i][j] += k * (dNdx * dMdx + dNdy * dMdy) * gp.weight * detJ;
-            }
+            gradients[i] = {
+                (dyds * dNdr[i] - dydr * dNds[i]) / detJ,
+                (-dxds * dNdr[i] + dxdr * dNds[i]) / detJ
+            };
         }
+        kernel.add_contribution(x, y, Vector(N, N + n), gradients,
+                                gp.weight * detJ, Ke, Fe);
     }
 }

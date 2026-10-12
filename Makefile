@@ -9,23 +9,27 @@ CXX = g++
 CXXFLAGS = -std=c++17 -Wall -Wextra -Iinclude
 
 COMMON_SOURCES = \
-	src/Mesh/Mesh.cpp \
-	src/Models/PoissonPhysics.cpp \
-	src/ShapeFunctions/ShapeFunction.cpp \
-	src/Quadrature/Quadrature.cpp \
-	src/Elements/Element.cpp \
-	src/System/FEMSystem.cpp \
-	src/BCs/DirichletBC.cpp \
-	src/Solvers/LinearSolver.cpp
+	src/mesh/Mesh.cpp \
+	src/materials/ConstantDiffusivity.cpp \
+	src/kernels/PoissonKernel.cpp \
+	src/postprocess/Output.cpp \
+	src/elements/ShapeFunction.cpp \
+	src/quadrature/Quadrature.cpp \
+	src/elements/Element.cpp \
+	src/assembly/FEMSystem.cpp \
+	src/bcs/DirichletBC.cpp \
+	src/solvers/LinearSolver.cpp
+
+HEADERS = $(wildcard include/*.h include/*/*.h)
 
 # 你运行 make 或 make all, 它会尝试构建 solver1d 和 solver2d 两个目标
 all: solver1d solver2d
 
-solver1d: $(COMMON_SOURCES) src/main.cpp
-	$(CXX) $(CXXFLAGS) -o $@ $(COMMON_SOURCES) src/main.cpp
+solver1d: $(COMMON_SOURCES) examples/poisson_1d.cpp $(HEADERS)
+	$(CXX) $(CXXFLAGS) -o $@ $(COMMON_SOURCES) examples/poisson_1d.cpp
 
-solver2d: $(COMMON_SOURCES) src/main_2d.cpp
-	$(CXX) $(CXXFLAGS) -o $@ $(COMMON_SOURCES) src/main_2d.cpp
+solver2d: $(COMMON_SOURCES) examples/poisson_2d.cpp $(HEADERS)
+	$(CXX) $(CXXFLAGS) -o $@ $(COMMON_SOURCES) examples/poisson_2d.cpp
 
 clean:
 	rm -f solver1d solver2d

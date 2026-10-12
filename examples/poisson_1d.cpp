@@ -1,12 +1,14 @@
 #include <iomanip>
 #include <iostream>
 
-#include "BCs/DirichletBC.h"
-#include "Elements/Element.h"
-#include "System/FEMSystem.h"
-#include "Solvers/LinearSolver.h"
-#include "Mesh/Mesh.h"
-#include "Models/PoissonPhysics.h"
+#include "bcs/DirichletBC.h"
+#include "elements/Element.h"
+#include "assembly/FEMSystem.h"
+#include "solvers/LinearSolver.h"
+#include "mesh/Mesh.h"
+#include "materials/ConstantDiffusivity.h"
+#include "kernels/PoissonKernel.h"
+#include "postprocess/Output.h"
 
 // ============================================================
 // 9. Main
@@ -28,7 +30,8 @@ int main()
     // --------------------------------------------------------
     // Define physics
     // --------------------------------------------------------
-    PoissonPhysics physics;
+    ConstantDiffusivity material;
+    PoissonKernel kernel(material);
 
     // --------------------------------------------------------
     // Create global system
@@ -42,7 +45,7 @@ int main()
     {
         LineElement element;
         // Calculate local Ke and Fe
-        element.compute(mesh,e,physics);
+        element.compute(mesh,e,kernel);
         // Assemble into global system
         system.assemble(mesh,e,element);
     }
@@ -89,17 +92,7 @@ int main()
         << std::setprecision(8);
 
 
-    for (int i = 0;
-         i < mesh.num_nodes();
-         ++i)
-    {
-        std::cout
-            << "x = "
-            << mesh.nodes[i][0]
-            << ", u = "
-            << u[i]
-            << '\n';
-    }
+    print_nodal_solution(mesh, u, std::cout);
 
 
     return 0;

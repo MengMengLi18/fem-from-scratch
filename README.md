@@ -18,30 +18,57 @@ boundary conditions, and more solvers.
 ## Project Structure
 
 ```text
-include/
-  BCs/
-  Elements/
-  Mesh/
-  Models/
-  Physics/
-  Quadrature/
-  ShapeFunctions/
-  Solvers/
-  System/
+include/                  # Public headers
+  assembly/               # FEMSystem: local-to-global matrix/load assembly
+  bcs/                    # Dirichlet conditions
+  elements/               # Elements, shape functions and geometry mapping
+  kernels/                # Poisson weak-form integration contributions
+  materials/              # Material coefficients, e.g. ConstantDiffusivity
+  mesh/                   # Nodes and element connectivity
+  postprocess/            # Nodal and center-value output
+  quadrature/             # Numerical integration rules
+  solvers/                # Dense reference linear solver
+  petsc/                  # Reserved: not implemented yet
   Common.h
-
-src/
-  BCs/
-  Elements/
-  Mesh/
-  Models/
-  Quadrature/
-  ShapeFunctions/
-  Solvers/
-  System/
-  main.cpp
-  main_2d.cpp
+src/                      # Implementations matching include/
+examples/
+  poisson_1d.cpp
+  poisson_2d.cpp
 ```
+
+### Module responsibilities
+
+`Element` evaluates geometry, shape values, physical gradients and integration
+weights. It delegates each integration-point contribution to `PoissonKernel`.
+The kernel evaluates the linear Poisson weak form using a `Material` diffusion
+coefficient and a callable source. `FEMSystem` maps element matrices and loads
+to the global system. Boundary conditions and the solver operate on that system;
+postprocessing formats the solution.
+
+`ConstantDiffusivity` replaces the coefficient part of `PoissonPhysics`; the
+source now belongs to `PoissonKernel`, separate from material data:
+
+```cpp
+ConstantDiffusivity material(1.0);
+PoissonKernel kernel(material, [](double x, double) { return x; });
+```
+
+The material must outlive the kernel. Examples default to diffusivity 1 and
+source 1, preserving the original numerical problem. The current kernel forms
+linear stiffness/load contributions; nonlinear residual and Jacobian kernels
+are a later stage. PETSc directories reserve the integration boundary and do not
+provide an implemented backend yet.
+
+### Directory migration
+
+| Previous location | Current location |
+|---|---|
+| `Mesh/`, `BCs/`, `Solvers/`, `Quadrature/` | `mesh/`, `bcs/`, `solvers/`, `quadrature/` |
+| `Elements/`, `ShapeFunctions/` | `elements/` |
+| `System/` | `assembly/` |
+| `Physics/`, `Models/PoissonPhysics` | `materials/` and `kernels/` |
+| `src/main.cpp`, `src/main_2d.cpp` | `examples/poisson_1d.cpp`, `examples/poisson_2d.cpp` |
+| Output embedded in examples | `postprocess/` |
 
 ## Build with Make
 
@@ -93,5 +120,6 @@ boundary conditions on a coarse mesh.
 
 - Add Neumann and mixed boundary conditions.
 - Add a 3-node quadratic line element.
-- Add iterative solvers such as CG and GMRES.
-- Add sparse matrix storage and preconditioners.
+- Validate P1/P2 error norms and mesh convergence.
+- Integrate PETSc Mat/Vec/KSP after linear FEM validation.
+- Implement nonlinear Poisson residual/Jacobian, then integrate SNES.
